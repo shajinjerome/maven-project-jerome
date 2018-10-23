@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:spring="http://www.springframework.org/schema/beans" 
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:json="http://www.mulesoft.org/schema/mule/json"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+	xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:spring="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
@@ -9,23 +11,31 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
 http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
 http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
-http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
-    
-    <flow name="mavenFlow">
-        <http:listener config-ref="HTTP_Listener_Configuration" path="/test" doc:name="HTTP"/>
-        <set-payload value="#['Hello Maven']" doc:name="Set Payload"/>
-    </flow>
-    <flow name="retrieveFlights">
-        <http:listener config-ref="HTTP_Listener_Configuration" path="/flights" allowedMethods="GET" doc:name="HTTP"/>
-        <db:select config-ref="Derby_Connection" doc:name="Database: Query FLIGHTS">
-            <db:parameterized-query><![CDATA[Select * from FLIGHTS]]></db:parameterized-query>
-        </db:select>
-        <json:object-to-json-transformer doc:name="Object to JSON"/>
-        <set-property propertyName="#[&quot;Content-Type&quot;]" value="#[&quot;application/json&quot;]" doc:name="Property"/>
-        <jms:outbound-endpoint queue="derby.flights" connector-ref="Active_MQ" doc:name="JMS - Send to Q: derby.flights"/>
-    </flow>
-    <flow name="logFlights">
-        <jms:inbound-endpoint queue="derby.flights" connector-ref="Active_MQ" doc:name="JMS - Recv from Q:derby.flights"/>
-        <logger message="#[payload]" level="INFO" doc:name="Logger"/>
-    </flow>
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd"
+>
+
+	<flow name="mavenFlow">
+		<http:listener config-ref="HTTP_Listener_Configuration" path="/test" doc:name="HTTP" />
+		<set-payload value="#['Hello Maven']" doc:name="Set Payload" />
+	</flow>
+
+
+	<flow name="retrieveFlights">
+		<http:listener config-ref="HTTP_Listener_Configuration" path="/flights" allowedMethods="GET" doc:name="HTTP" />
+		<db:select config-ref="Derby_Connection" doc:name="Database: Query FLIGHTS">
+			<db:parameterized-query><![CDATA[Select * from FLIGHTS]]></db:parameterized-query>
+		</db:select>
+		<json:object-to-json-transformer doc:name="Object to JSON" />
+		<set-property propertyName="#[&quot;Content-Type&quot;]" value="#[&quot;application/json&quot;]"
+			doc:name="Property" />
+		<jms:outbound-endpoint queue="derby.flights" connector-ref="Active_MQ" doc:name="JMS - Send to Q: derby.flights" />
+	</flow>
+
+
+	<flow name="logFlights">
+		<jms:inbound-endpoint queue="derby.flights" connector-ref="Active_MQ" doc:name="JMS - Recv from Q:derby.flights" />
+		<logger message="#[payload]" level="INFO" doc:name="Logger" />
+	</flow>
+
+
 </mule>
